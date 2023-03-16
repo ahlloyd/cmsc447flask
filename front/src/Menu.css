@@ -1,0 +1,70 @@
+.content {
+    --col-width: 225px;
+}
+
+.content, .vform, .menu {
+    display: flex;
+    flex-direction: column;
+}
+
+.content, .menu {
+    align-items: center;
+}
+
+.menu {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: min-content min-content min-content;
+    grid-auto-flow: column;
+    justify-items: center;
+    align-items: end;
+    column-gap: 1.5em;
+}
+
+.vform {
+    width: 225px;
+    width: var(--col-width);
+    text-align: left;
+}
+
+.vform > * {
+    margin-bottom: 1em;
+}
+
+.vform button {
+    font-weight: bold;
+    padding: 0.5em 0;
+    cursor: pointer;
+}
+
+.menu .banner {
+    --banner-color: 13, 74, 22;
+    width: 225px;
+    width: var(--col-width);
+    opacity: 0;
+    background-color: rgba(13, 74, 22, 0.2);
+    background-color: rgba(var(--banner-color), 0.2);
+    padding: 0.5em;
+    border: 2px solid rgb(13, 74, 22);
+    border-color: rgb(var(--banner-color));
+    box-sizing: border-box;
+    pointer-events: none;
+    -webkit-user-select: none; /* Safari (all) */
+    -moz-user-select: none; /* Firefox v2-v68 */
+    -ms-user-select: none; /* IE v10-v11 */
+    user-select: none;
+    cursor: pointer;
+}
+
+.menu .banner.failure {
+    --banner-color: 74, 13, 13;
+}
+
+.menu .banner.visible {
+    animation: fadeIn 3s forwards;
+}
+
+@keyframes fadeIn {
+    0%   { opacity: 0; }
+    100% { opacity: 1; }
+}
