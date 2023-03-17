@@ -1,19 +1,24 @@
+"""
+    author: Alex Lloyd <alloyd2@umbc.edu>
+"""
+
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+# from datetime import datetime
 
-players = [
-{'id': 0,
-'name': 'Tom Brady',
-'team': 'Buccaneers'},
-{'id': 1,
-'name': 'Aaron Rodgers',
-'team': 'Packers'},
-{'id':2,
-'name':'Patrick Mahomes',
-'team': 'Chiefs'}
-]
-x = datetime.now()
+## Old tutorial stuff, unused
+# players = [
+# {'id': 0,
+# 'name': 'Tom Brady',
+# 'team': 'Buccaneers'},
+# {'id': 1,
+# 'name': 'Aaron Rodgers',
+# 'team': 'Packers'},
+# {'id':2,
+# 'name':'Patrick Mahomes',
+# 'team': 'Chiefs'}
+# ]
+# x = datetime.now()
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
@@ -29,6 +34,15 @@ class User(db.Model):
     lastName   = db.Column(db.String(20), nullable=False)
     points     = db.Column(db.Integer,    nullable=False)
 
+    # How the object is jsonified
+    def getJSON(self):
+        return jsonify({
+            'id':        self.id,
+            'firstName': self.firstName,
+            'lastName':  self.lastName,
+            'points':    self.points
+        })
+
     # How the object is printed
     def __repr__(self):
         id = -1
@@ -39,6 +53,12 @@ class User(db.Model):
             id = self.id
 
         return f"User('{id}', '{self.firstName} {self.lastName}', '{self.points}')"
+
+# # ref: https://pynative.com/make-python-class-json-serializable/
+# # ref: https://stackoverflow.com/questions/41658015/object-has-no-attribute-dict-in-python3
+# class UserEncoder(JSONEncoder):
+#         def default(self, o):
+#             return o.__dict__
 
 def resetDatabase():
     # Defaults
@@ -116,34 +136,64 @@ def create():
     # Add new user to database
     user = User(id=idInt, firstName=firstName, lastName=lastName, points=pointsInt)
 
+    # Attempt to add to database
+    try:
+        db.session.add(user)
+        db.session.commit()
+    except Exception as e:
+        # Uniqueness error (probably), bail out
+        o = str(e)
+        db.session.close()
+        return 'Uniqueness error', 406 # 406 not acceptable
+
     # Received, OK (created)
     return 'Done', 201
 
 # Route for searching users
 @app.route("/search", methods=["POST"], strict_slashes=False)
 def search():
-    receivedData = request.get_json()
-    firstName    = receivedData['firstNameS']
-    lastName     = receivedData['lastNameS']
+    # Vars
+    receivedData = None
+    firstName    = None
+    lastName     = None
+    o            = None
+
+    try:
+        receivedData = request.get_json()
+        firstName    = receivedData['firstNameS']
+        lastName     = receivedData['lastNameS']
+    except Exception as e:
+        o = str(e)
+        return 'Malformed request', 400
 
     print("JSON:", receivedData)
     print("Name:", firstName, lastName)
 
-    # Received, user name not found
-    return 'No results', 404
+    # Search by Last, First
+    user = User.query.filter_by(lastName=lastName, firstName=firstName).first()
+    if user is None:
+        print("User was not found")
+        db.session.close()
+        return 'No such user', 404
 
-# Route for sending data after a successful search
-@app.route('/search/result', methods=["GET"], strict_slashes=False)
-def searchResult():
-    # Returning an api for showing in  reactjs
-    return {
-        'Name':"geek", 
-        "Age":"22",
-        "Date":x, 
-        "programming":"python"
-        }
+    print("Found:", user)
+
+    # User found, send back data
+    return user.getJSON(), 201
+
+# # Route for sending data after a successful search
+# @app.route('/search/result', methods=["GET"], strict_slashes=False)
+# def searchResult():
+#     # Returning an api for showing in  reactjs
+#     return {
+#         'Name':"geek", 
+#         "Age":"22",
+#         "Date":x, 
+#         "programming":"python"
+#         }
 
 # Route to reset the database to its defaults
+# NOTE: Untested, not implemented on front end
 @app.route("/reset", methods=["POST"], strict_slashes=False)
 def reset():
     resetDatabase()
@@ -179,6 +229,7 @@ def delete():
         print(User.query.all())
     else:
         print("User was not found")
+        db.session.close()
         return 'No such user', 404
 
     # Founded & deleted (ok)

@@ -1,3 +1,6 @@
+/**
+ * @author Alex Lloyd <alloyd2@umbc.edu>
+ */
 .content {
     --col-width: 225px;
 }
@@ -14,11 +17,56 @@
 .menu {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: min-content min-content min-content;
+    grid-template-rows: min-content min-content min-content min-content;
+    grid-template-areas:
+        "nHead   sHead   dHead  "
+        "nForm   sForm   dForm  "
+        "nBanner sBanner dBanner"
+        "sResult sResult sResult";
     grid-auto-flow: column;
     justify-items: center;
     align-items: end;
     column-gap: 1.5em;
+}
+
+.nHead {
+    grid-area: nHead;
+}
+
+.sHead {
+    grid-area: sHead;
+}
+
+.dHead {
+    grid-area: dHead;
+}
+
+.nForm {
+    grid-area: nForm;
+}
+
+.sForm {
+    grid-area: sForm;
+}
+
+.dForm {
+    grid-area: dForm;
+}
+
+.nBanner {
+    grid-area: nBanner;
+}
+
+.sBanner {
+    grid-area: sBanner;
+}
+
+.dBanner {
+    grid-area: dBanner;
+}
+
+.sResult {
+    grid-area: sResult;
 }
 
 .vform {

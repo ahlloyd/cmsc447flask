@@ -1,3 +1,6 @@
+/**
+ * @author Alex Lloyd <alloyd2@umbc.edu>
+ */
 import { useState } from "react";
 import classNames from "classnames";
 import './Menu.css';
@@ -13,6 +16,11 @@ const Menu = () => {
     // Search User vars
     const [firstNameS, setFirstS] = useState('');
     const [lastNameS, setLastS]   = useState('');
+    // Search User result vars
+    const [firstNameR, setFirstR] = useState('');
+    const [lastNameR, setLastR]   = useState('');
+    const [pointsR, setPointsR]   = useState(-1);
+    const [userIDR, setIDR]       = useState(-1);
     // Banner vars
     const [message, setMessage]   = useState('');
     const [success, setSuccess]   = useState(false);
@@ -48,9 +56,9 @@ const Menu = () => {
 
     return (
         <div className="menu">
-            <h2>New User</h2>
+            <h2 className="nHead">New User</h2>
             {/* Stop freaking reloading */}
-            <form className="vform" onSubmit={(e) => e.preventDefault()}>
+            <form className="vform nForm" onSubmit={(e) => e.preventDefault()}>
                 <label>Last Name:</label>
                 <input 
                     type="text"
@@ -100,7 +108,11 @@ const Menu = () => {
                                 console.log("User successfully created");
                                 setMessage("User successfully created");
                                 setSuccess(true);
-                            } else if (response.status == 422) {
+                            } else if (response.status === 406) {
+                                console.log("Uniqueness error");
+                                setMessage("User ID already exists!");
+                                setSuccess(false);
+                            } else if (response.status === 422) {
                                 badInput();
                             } else {
                                 console.log("Failed to create new user");
@@ -119,13 +131,14 @@ const Menu = () => {
             </form>
             <div className={classNames({
                 banner: true,
+                nBanner: true,
                 success: success,
                 failure: !success,
                 visible: cVisible
             })}>{message}</div>
-            <h2>Search User</h2>
+            <h2 className="sHead">Search User</h2>
             {/* Stop freaking reloading */}
-            <form className="vform" onSubmit={(e) => e.preventDefault()}>
+            <form className="vform sForm" onSubmit={(e) => e.preventDefault()}>
                 <label>Last Name:</label>
                 <input 
                     type="text"
@@ -158,10 +171,17 @@ const Menu = () => {
     
                             /* Check success */
                             if (response.ok) {
-                                console.log("User successfully created");
-                                setMessage("User successfully created");
+                                console.log("User found!");
+                                response.json().then(function(result) {
+                                    // i HATE promises so much
+                                    setFirstR(result.firstName);
+                                    setLastR(result.lastName);
+                                    setPointsR(result.points);
+                                    setIDR(result.id);
+                                });
+                                setMessage("User found!");
                                 setSuccess(true);
-                            } else if (response.status == 404) {
+                            } else if (response.status === 404) {
                                 console.log("Failed to find user");
                                 setMessage("Failed to find user");
                                 setSuccess(false);
@@ -182,13 +202,14 @@ const Menu = () => {
             </form>
             <div className={classNames({
                 banner: true,
+                sBanner: true,
                 success: success,
                 failure: !success,
                 visible: sVisible
             })}>{message}</div>
-            <h2>Remove User</h2>
+            <h2 className="dHead">Remove User</h2>
             {/* Stop freaking reloading */}
-            <form className="vform" onSubmit={(e) => e.preventDefault()}>
+            <form className="vform dForm" onSubmit={(e) => e.preventDefault()}>
                 <label>ID (positive int):</label>
                 <input 
                     type="text"
@@ -217,7 +238,7 @@ const Menu = () => {
                                 console.log("User successfully deleted");
                                 setMessage("User successfully deleted");
                                 setSuccess(true);
-                            } else if (response.status == 404) {
+                            } else if (response.status === 404) {
                                 console.log("ID not found");
                                 setMessage("ID not found");
                                 setSuccess(false);
@@ -238,10 +259,12 @@ const Menu = () => {
             </form>
             <div className={classNames({
                 banner: true,
+                dBanner: true,
                 success: success,
                 failure: !success,
                 visible: dVisible
             })}>{message}</div>
+            <div className="sResult">{firstNameR} {lastNameR} {pointsR} {userIDR}</div>
         </div>
     );
 }

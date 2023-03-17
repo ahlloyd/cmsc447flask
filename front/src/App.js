@@ -1,3 +1,6 @@
+/**
+ * @author Alex Lloyd <alloyd2@umbc.edu>
+ */
 import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 import { useEffect, useState } from 'react'
 import Menu from './Menu';
