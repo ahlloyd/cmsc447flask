@@ -4,21 +4,6 @@
 
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-# from datetime import datetime
-
-## Old tutorial stuff, unused
-# players = [
-# {'id': 0,
-# 'name': 'Tom Brady',
-# 'team': 'Buccaneers'},
-# {'id': 1,
-# 'name': 'Aaron Rodgers',
-# 'team': 'Packers'},
-# {'id':2,
-# 'name':'Patrick Mahomes',
-# 'team': 'Chiefs'}
-# ]
-# x = datetime.now()
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
@@ -92,8 +77,8 @@ def resetDatabase():
     db.session.add(user_7)
     db.session.commit()
 
-    # Send out data
-    print(User.query.all())
+    # # Send out data
+    # print(User.query.all())
 
 # Route for creating new users
 @app.route("/create", methods=["POST"], strict_slashes=False)
@@ -128,10 +113,10 @@ def create():
     if pointsInt < 0 or idInt < 1:
         return 'Bad format', 422
 
-    print("JSON:  ", receivedData)
-    print("Name:  ", firstName, lastName)
-    print("Points:", pointsInt)
-    print("ID:    ", idInt)
+    # print("JSON:  ", receivedData)
+    # print("Name:  ", firstName, lastName)
+    # print("Points:", pointsInt)
+    # print("ID:    ", idInt)
 
     # Add new user to database
     user = User(id=idInt, firstName=firstName, lastName=lastName, points=pointsInt)
@@ -166,31 +151,20 @@ def search():
         o = str(e)
         return 'Malformed request', 400
 
-    print("JSON:", receivedData)
-    print("Name:", firstName, lastName)
+    # print("JSON:", receivedData)
+    # print("Name:", firstName, lastName)
 
     # Search by Last, First
     user = User.query.filter_by(lastName=lastName, firstName=firstName).first()
     if user is None:
-        print("User was not found")
+        # print("User was not found")
         db.session.close()
         return 'No such user', 404
 
-    print("Found:", user)
+    # print("Found:", user)
 
     # User found, send back data
     return user.getJSON(), 201
-
-# # Route for sending data after a successful search
-# @app.route('/search/result', methods=["GET"], strict_slashes=False)
-# def searchResult():
-#     # Returning an api for showing in  reactjs
-#     return {
-#         'Name':"geek", 
-#         "Age":"22",
-#         "Date":x, 
-#         "programming":"python"
-#         }
 
 # Route to reset the database to its defaults
 # NOTE: Untested, not implemented on front end
@@ -217,18 +191,18 @@ def delete():
         o = str(e)
         return 'Malformed request', 400
 
-    print("JSON:", receivedData)
-    print("ID:  ", userID)
+    # print("JSON:", receivedData)
+    # print("ID:  ", userID)
 
     # Search by ID
     user = User.query.filter_by(id=userID).first()
     if user is not None:
-        print("Deleted:", user)
+        # print("Deleted:", user)
         db.session.delete(user)
         db.session.commit()
-        print(User.query.all())
+        # print(User.query.all())
     else:
-        print("User was not found")
+        # print("User was not found")
         db.session.close()
         return 'No such user', 404
 
