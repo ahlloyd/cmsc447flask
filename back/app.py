@@ -39,12 +39,6 @@ class User(db.Model):
 
         return f"User('{id}', '{self.firstName} {self.lastName}', '{self.points}')"
 
-# # ref: https://pynative.com/make-python-class-json-serializable/
-# # ref: https://stackoverflow.com/questions/41658015/object-has-no-attribute-dict-in-python3
-# class UserEncoder(JSONEncoder):
-#         def default(self, o):
-#             return o.__dict__
-
 def resetDatabase():
     # Defaults
     user_1 = User(id=211, firstName='Steve',  lastName='Smith',     points=80)
