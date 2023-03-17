@@ -26,6 +26,7 @@ const Menu = () => {
     const [success, setSuccess]   = useState(false);
     const [cVisible, setCBanner]  = useState(false);
     const [sVisible, setSBanner]  = useState(false);
+    const [rVisible, setRBanner]  = useState(false);
     const [dVisible, setDBanner]  = useState(false);
 
     // Support functions
@@ -33,7 +34,7 @@ const Menu = () => {
         return new Promise(res => setTimeout(res, delay));
     }
 
-    function resetVars() {
+    function resetVars(hasResult = false) {
         setFirst('');
         setLast('');
         setPoints(-1);
@@ -41,11 +42,20 @@ const Menu = () => {
         setFirstS('');
         setLastS('');
         setID(-1);
+        setFirstR('');
 
         // Kill banners too
         setCBanner(false);
         setSBanner(false);
         setDBanner(false);
+
+        // Reset search results
+        if (!hasResult) {
+            setLastR('');
+            setPointsR(-1);
+            setIDR(-1);
+            setRBanner(false);
+        }
     }
 
     function badInput() {
@@ -178,24 +188,28 @@ const Menu = () => {
                                     setLastR(result.lastName);
                                     setPointsR(result.points);
                                     setIDR(result.id);
+                                    setRBanner(true);
                                 });
                                 setMessage("User found!");
                                 setSuccess(true);
+                                resetVars(true);
                             } else if (response.status === 404) {
                                 console.log("Failed to find user");
                                 setMessage("Failed to find user");
                                 setSuccess(false);
+                                resetVars();
                             } else {
                                 console.log("Couldn't contact server");
                                 setMessage("Couldn't contact server");
                                 setSuccess(false);
+                                resetVars();
                             };
                         } else {
                             badInput();
+                            resetVars();
                         }
     
                         /* Reset vars & display banner */
-                        resetVars();
                         setSBanner(true);
                     }
                 }>Search</button>
@@ -264,7 +278,16 @@ const Menu = () => {
                 failure: !success,
                 visible: dVisible
             })}>{message}</div>
-            <div className="sResult">{firstNameR} {lastNameR} {pointsR} {userIDR}</div>
+            <div className={classNames({
+                sResult: true,
+                visible: rVisible
+            })}>
+                <h2>Search Result</h2>
+                <hr/>
+                <p>{lastNameR}, {firstNameR}</p>
+                <p>Points: {pointsR}</p>
+                <p>ID: {userIDR}</p>
+            </div>
         </div>
     );
 }
